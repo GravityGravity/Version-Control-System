@@ -6,10 +6,8 @@ file desc:
 
 */
 
-
-
-const fs = require('node:fs');
 const {orgFileV, newFileV} = require('./fileHandler.js');
+const {comparator} = require('./Comparator.js');
 let memoGraph; //2D memoization graph to track LCS sub-problems
 
 if (newFileV.length > orgFileV.length) {
@@ -18,7 +16,7 @@ if (newFileV.length > orgFileV.length) {
     printMGraph(memoGraph);
     LCS(orgFileV, orgFileV.length - 1, newFileV, newFileV.length - 1);
     printMGraph(memoGraph);
-    comparator(memoGraph[orgFileV.length - 1][newFileV.length - 1])
+    comparator(memoGraph[orgFileV.length - 1][newFileV.length - 1], orgFileV, newFileV);
 
 } else {
 
@@ -26,7 +24,7 @@ if (newFileV.length > orgFileV.length) {
     printMGraph(memoGraph);
     LCS(newFileV, newFileV.length - 1, orgFileV, orgFileV.length - 1);
     printMGraph(memoGraph);
-    comparator(memoGraph[newFileV.length - 1][orgFileV.length - 1])
+    comparator(memoGraph[newFileV.length - 1][orgFileV.length - 1], orgFileV, newFileV)
 }
 
 /**
@@ -75,7 +73,18 @@ function LCS (strArr1, arr1Len, strArr2, arr2Len) {
     } else if (strArr1[arr1Len] === strArr2[arr2Len]) { //case2: string cmp subproblem is not in memoization table => Check if chars match and write into memoization table
         process.stdout.write('case2   ');
         //Call top left:  	↖ 
-        memoGraph[arr1Len][arr2Len] = LCS(strArr1, arr1Len - 1, strArr2, arr2Len -1).concat('~~' + strArr1[arr1Len]);   //Call next ↖ table cell after LCS finishes write to memoization table and return string value in memoization table
+        let case2Str = LCS(strArr1, arr1Len - 1, strArr2, arr2Len -1)
+
+        if(case2Str === '') {
+
+            memoGraph[arr1Len][arr2Len] = strArr1[arr1Len];
+
+        } else {
+
+            memoGraph[arr1Len][arr2Len] = case2Str.concat('~~' + strArr1[arr1Len]);
+
+        }
+        // memoGraph[arr1Len][arr2Len] = LCS(strArr1, arr1Len - 1, strArr2, arr2Len -1).concat('~~' + strArr1[arr1Len]);   //Call next ↖ table cell after LCS finishes write to memoization table and return string value in memoization table
         return memoGraph[arr1Len][arr2Len]; //returns string
 
     } else {
@@ -122,19 +131,4 @@ function printMGraph (graph) {
     }
 }
 
-/**
- * @Description Compares LCS to both file streams. If a words are not a match, add it to changelog signaling DELETION or ADDITION depending on the following Two cases:
- *      Original File: 
- * @param {String} LCSstring 
- * @returns: 
- */
-function comparator (LCSstring) {
 
-//     console.log(`\u001b[33m     comparator()\u001b[0m`);
-//     let date = new Date();
-//     let LCSarray = LCSstring.split('');
-//     console.log(LCSarray);
-
-//     // changelog = fs.('Changelog:'+ date, )
-
-}

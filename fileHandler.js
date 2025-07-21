@@ -4,8 +4,8 @@ console.log(`\n...\u001b[37;43mFILEHANDLER.JS\u001b[0m`); //DEBUG
 
 
 
-const orgFileV = fileToWordArray('textfiles/textV1.txt', 'Original');
-const newFileV = fileToWordArray('textfiles/textV2.txt', 'Current');
+const orgFileV = fileToWordArray('exampleDir/textV1.txt', 'Original');
+const newFileV = fileToWordArray('exampleDir/textV2.txt', 'Current');
 
 /**
  * @param {string} path - path of src code txt file (utf8 encoding)
@@ -18,7 +18,7 @@ function fileToWordArray (path, fileName) {    //returns long file string into a
 
     //Check if machine has access to path if not return error (NodeJS:FS module)
     try {   
-        fs.accessSync('textfiles/textV1.txt', fs.constants.R_OK);
+        fs.accessSync(path, fs.constants.R_OK);
         console.log('\u001b[32mcan read/write ✓\u001b[0m');
 
     } catch (err) {
