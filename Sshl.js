@@ -63,8 +63,8 @@ function shlLoop () {
             
             
             
+        //Initial state
         if (shellState === 0) {    
-            //shell state changes
             if (line[0] === "exit") {
                 rl.close();
                 return ;
@@ -92,8 +92,9 @@ function shlLoop () {
             }
         }
             
+        
             
-            //shell state prompt check
+            //shell state prompt print
             if (shellState === 0) {
                 
                 rl.setPrompt('\u001b[33m<' + __dirname + '>\u001b[0m \u001b[34minitial> \u001b[0m');
@@ -103,12 +104,18 @@ function shlLoop () {
                 
                 
                 rl.setPrompt('\u001b[33m<' + __dirname + '>\u001b[0m \u001b[34m[\'RepoName\']> \u001b[0m'); //add Repo name
+            }
+
+            //There are not shell states below 0 or above 1
+            if ((shellState < 0) || (shellState > 1)) {
+                console.log('...Exiting Sapce Version Control Shell... [ShellState < 0 OR Shellstate > 1]');
+                rl.close();
+                return ;
             }     
             
             rl.prompt();
         });
     })
-    
 };
 
 /**

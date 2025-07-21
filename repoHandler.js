@@ -7,11 +7,22 @@
 
 const fs = require('node:fs');
 const { createRequire } = require('node:module');
-let allRepos = null;
+let allRepos = null; //
 let repoData = null;
 
-// repoHandle('list', 'FirstRepo', 0);
+allRepos = JSON.parse(fs.readFileSync('repos.JSON', 'utf-8'));
+console.log(allRepos); //debug
 
+// repoHandle('list', 'FirstRepo', 0);
+/**
+ * DESC: Command selection switch case:
+ * 
+ * 
+ * @param {string} cmd - shell commands
+ * @param {string} selectedRepo - OPTIONAL|| Name of Repo
+ * @param {int} shlState 
+ * @returns: Function calls or Undefined
+ */
 async function repoHandle(cmd, selectedRepo, shlState) {
 
     repoData = await getRepo(selectedRepo);
@@ -25,7 +36,7 @@ async function repoHandle(cmd, selectedRepo, shlState) {
         case 'list':
             return listRepos();
         case 'delete':
-            return deleteRepo();
+            return deleteRepo(selectedRepo);
         default:
             console.log('\x1b[31mERROR!! cmd: \"' + cmd + '\" DOES NOT EXIT\u001b[0m');
             return undefined;
@@ -81,9 +92,6 @@ function listRepos () {
  * @returns an object of key-value pairs of repo info
  */
 async function getRepo (repoName) {
-
-    repoStr = fs.readFileSync('repos.JSON', 'utf-8');
-    allRepos = JSON.parse(repoStr);
     console.log(allRepos); //debug
 
     repo = allRepos.find(({name}) => {
