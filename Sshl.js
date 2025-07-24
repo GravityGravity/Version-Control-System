@@ -26,6 +26,7 @@ let shellState = 0;
 //Dependecies
 const readlinePromises = require('node:readline');
 const { repoHandle } = require('./repoHandler.js');
+const { parse } = require('node:path');
 const rl = readlinePromises.createInterface({
 
     input: process.stdin,
@@ -57,41 +58,45 @@ function shlLoop () {
         rl.on('line', async function(line) {       
             
             //Parse user input
-            line = await parseLine(line);
+            try {
+                line = await parseLine(line);
+            } catch(e) {
+                console.log(e);
+            }
+
+            rl.pause();
+
             console.log(line);
             
-            
-            
-            
         //Initial state
-        if (shellState === 0) {    
-            if (line[0] === "exit") {
-                rl.close();
-                return ;
+            if (shellState === 0) {    
+                if (line[0] === "exit") {
+                    console.log('...Exiting Sapce Version Control Shell... [exit Called]');
+                    rl.close();
+                    return ;
+                }
+                
+                if (line[0] === "access") {
+                    
+                    shellState++;  
+                    console.log(shellState); //debug
+                    
+                }
+                
+                if (line[0] === "back") {
+                    
+                    shellState--;
+                    console.log(shellState); //debug
+                    
+                }
+                
+                if (shellState < 0) {
+                    console.log('...Exiting Sapce Version Control Shell... [Shell State < 0]');
+                    rl.close();
+                    return ;
+                    
+                }
             }
-            
-            if (line[0] === "access") {
-                
-                shellState++;  
-                console.log(shellState); //debug
-                
-            }
-            
-            if (line[0] === "back") {
-                
-                shellState--;
-                console.log(shellState); //debug
-                
-            }
-            
-            if (shellState < 0) {
-                console.log('...Exiting Sapce Version Control Shell... [Shell State < 0]');
-                rl.close();
-                return ;
-                
-            }
-        }
-            
         
             
             //shell state prompt print
@@ -124,7 +129,15 @@ function shlLoop () {
 */
 function parseLine (shlInput) {
     
-    let parseInput = shlInput.split(/ (.*)/);
+    let parseInput = shlInput.toLowerCase();
+
+    parseInput  = parseInput.split(/ (.*)/);
+
+    if (parseInput.length > 4) {
+
+        throw new Error(`TOO MANY ARGUMENTS IN COMMAND INPUT: 
+                [cmd] [RepositoryName (No Spaces)]`);
+    }
     
     return parseInput;
 };
@@ -133,5 +146,3 @@ function parseLine (shlInput) {
 function initialization () { //Check for repository json file exists with in VCS installation directory
 
 };
-
-

@@ -5,15 +5,14 @@
 
 */
 
+const { create } = require('node:domain');
 const fs = require('node:fs');
-const { createRequire } = require('node:module');
+const readline = require('node:readline/promises');
 let allRepos = null; //
 let repoData = null;
 
 allRepos = JSON.parse(fs.readFileSync('repos.JSON', 'utf-8'));
-console.log(allRepos); //debug
-
-// repoHandle('list', 'FirstRepo', 0);
+repoHandle('create', 'FirstTrial');
 /**
  * DESC: Command selection switch case:
  * 
@@ -30,60 +29,114 @@ async function repoHandle(cmd, selectedRepo, shlState) {
     switch (cmd) {
         case 'access':
             return getRepo(selectedRepo);
+
         case 'create':
             return createRepo(selectedRepo);
             // return '\u001b[32mRepo Created:\"' + selectedRepo + '\"✓\u001b[0m'
+
         case 'list':
             return listRepos();
+
         case 'delete':
             return deleteRepo(selectedRepo);
+
         default:
-            console.log('\x1b[31mERROR!! cmd: \"' + cmd + '\" DOES NOT EXIT\u001b[0m');
+            console.log('   \x1b[31mERROR!! cmd: \"' + cmd + '\" DOES NOT EXIT\u001b[0m');
             return undefined;
     }
 }
-
-
-
 
 /**
  * @description Creates a new repo and appends it to the JSON repo list
  * @param {string} name 
  */
-function creatRepo (name) {
+async function createRepo (newRepoName) {
+
+    if(getRepo(newRepoName) === undefined) {
+        
+        const rl = readline.createInterface({
+
+        input: process.stdin,
+        output: process.stdout
 
 
+        });
 
+        let path = await rl.question('  PLEASE INPUT PATH: ');
+        rl.close();
+        
+        newRepo = {
 
+            name: newRepoName,
+            dateCreated: (new Intl.DateTimeFormat("en-US").format(new Date())),
+            Path: path, 
+            Versions: []
 
+                }
+
+        console.log(newRepo);
+
+        allRepos.push(newRepo);
+        let JSONallrepos = JSON.stringify(allRepos, null, "\t");
+        
+        fs.writeFileSync('./repos.JSON', JSONallrepos);
+
+        console.log(`++Added new Repository: ${newRepoName} to list\n`);
+        console.log(allRepos);
+        
+
+    } else {
+
+        console.log("Error!!");
+        // throw new Error(`   \x1b[31mERROR!! Repository Name '${newRepoName} already taken\u001b[0m\n`);
+
+    }
 
 }
 
 /**
  * @description Deletes an exiting repo within the JSON list
- * @param {string} name
+ * @param {string} repoName
  */
-function deleteRepo (name) {
+function deleteRepo (repoName) {
 
-    const index = allRepos.indexOF( );
+    if (getRepo(repoName) !== undefined) {
+
+        allRepos.splice(allRepos.findIndex( ({name}) => name === repoName), 2);
+
+        let JSONallrepos = JSON.stringify(allRepos, null, "\t");
+        
+        fs.writeFileSync('./repos.JSON', JSONallrepos);
+
+        console.log(`--Deleted new Repository: ${repoName} to list\n`);
+
+    } else {
+        
+        // throw new Error(`   \x1b[31mERROR!! Repository Name '${repoName} does not exist\u001b[0m\n`)
+
+    }
 
 }
 
 /**
  * @description List all repo names within JSON list
- * @param {string} name
  */
 function listRepos () {
 
-    console.log('\n   ==LIST OF REPOS===');
+    if (allRepos.length > 0) {
+        console.log('\n   ==LIST OF REPOS===');
 
-    allRepos.forEach(({name}) => {
+        allRepos.forEach(({name}) => {
     
-        console.log('       ' + name);
+           console.log('       ' + name);
         
-    });
+        });
+    } else {
 
+        console.log('\n   ==LIST OF REPOS===');
+        console.log('\n         ~~none~~');
 
+    }
 }
 
 /**
@@ -91,14 +144,18 @@ function listRepos () {
  * @param {string} repoName 
  * @returns an object of key-value pairs of repo info
  */
-async function getRepo (repoName) {
+function getRepo (repoName) {
     console.log(allRepos); //debug
 
     repo = allRepos.find(({name}) => {
         return name === repoName; });
 
+    console.log('GetRepo() found:')
+    console.log(repo)
     return repo;
 }
+
+
 
 
 module.exports = { repoHandle, getRepo };
