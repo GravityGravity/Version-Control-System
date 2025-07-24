@@ -22,49 +22,40 @@ LEVEL2:
 */
 
 let shellState = 0;
+let stringShlState = 'initial>';
 
 //Dependecies
-const readlinePromises = require('node:readline');
+const readline = require('node:readline/promises');
 const { repoHandle } = require('./macroRepoHandler.js');
 const { parse } = require('node:path');
-const rl = readlinePromises.createInterface({
 
-    input: process.stdin,
-    output: process.stdout,
-
-});
-
-
-run();
-
-function run() { //Runs shell application
-
-    shlLoop();
-
-};
-
-
+shlLoop();
 
 /**
  * @description Shell Father Function: infinite loop awaiting commands from user
 */
-function shlLoop () {
-    
-    return new Promise(function(resolve, reject){
-        
-        rl.setPrompt('\u001b[33m<' + __dirname + '>\u001b[0m \u001b[34minitial> \u001b[0m');
-        
-        rl.prompt();
-        rl.on('line', async function(line) {       
+async function shlLoop () {
+
+        while(true) {       
+
+            const rl = readline.createInterface({
+
+            input: process.stdin,
+            output: process.stdout,
+
+            });
+
             
             //Parse user input
+            let line = await rl.question('\u001b[33m<' + __dirname + '>\u001b[0m \u001b[34m' + stringShlState + '\u001b[0m');
+
+            rl.close();
+
             try {
                 line = await parseLine(line);
             } catch(e) {
                 console.log(e);
             }
-
-            rl.pause();
 
             console.log(line);
             
@@ -115,21 +106,6 @@ function shlLoop () {
                 return ;
                     
             }
-        
-            
-        
-            
-            //shell state prompt print
-            if (shellState === 0) {
-                
-                rl.setPrompt('\u001b[33m<' + __dirname + '>\u001b[0m \u001b[34minitial> \u001b[0m');
-                
-            }
-            if (shellState === 1) {
-                
-                
-                rl.setPrompt('\u001b[33m<' + __dirname + '>\u001b[0m \u001b[34m[\'RepoName\']> \u001b[0m'); //add Repo name
-            }
 
             //There are not shell states below 0 or above 1
             if ((shellState < 0) || (shellState > 1)) {
@@ -138,9 +114,7 @@ function shlLoop () {
                 return ;
             }     
             
-            rl.prompt();
-        });
-    })
+        };
 };
 
 /**
