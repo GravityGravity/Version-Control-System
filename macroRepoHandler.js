@@ -5,31 +5,21 @@
 
 */
 
-const { create } = require('node:domain');
 const fs = require('node:fs');
 const readline = require('node:readline/promises');
 let allRepos = null; //
 let repoData = null;
 
-
-dialog(config).then(dirPath => {
-  console.log('Selected folder:', dirPath);
-}).catch(err => {
-  console.error('User canceled or error:', err);
-});
-
 allRepos = JSON.parse(fs.readFileSync('repos.JSON', 'utf-8'));
-// repoHandle('create', 'FirstTrial');
 /**
  * DESC: Command selection switch case:
- * 
  * 
  * @param {string} cmd - shell commands
  * @param {string} selectedRepo - OPTIONAL|| Name of Repo
  * @param {int} shlState 
  * @returns: Function calls or Undefined
  */
-async function repoHandle(cmd, selectedRepo, shlState) {
+async function repoHandle(cmd, selectedRepo) {
 
     repoData = await getRepo(selectedRepo);
 
@@ -49,7 +39,7 @@ async function repoHandle(cmd, selectedRepo, shlState) {
 
         default:
             console.log('   \x1b[31mERROR!! cmd: \"' + cmd + '\" DOES NOT EXIT\u001b[0m');
-            return undefined;
+            return null;
     }
 }
 
@@ -96,8 +86,7 @@ async function createRepo (newRepoName) {
 
     } else {
 
-        console.log("Error!!");
-        // throw new Error(`   \x1b[31mERROR!! Repository Name '${newRepoName} already taken\u001b[0m\n`);
+        console.log(`   \x1b[31mERROR!! Repository Name '${newRepoName} already taken\u001b[0m\n`);
 
     }
 
@@ -121,7 +110,7 @@ function deleteRepo (repoName) {
 
     } else {
         
-        // throw new Error(`   \x1b[31mERROR!! Repository Name '${repoName} does not exist\u001b[0m\n`)
+        console.log(`   \x1b[31mERROR!! Repository Name '${repoName} does not exist\u001b[0m\n`)
 
     }
 
@@ -140,11 +129,14 @@ function listRepos () {
            console.log('       ' + name);
         
         });
+
+        return ;
     } else {
 
         console.log('\n   ==LIST OF REPOS===');
-        console.log('\n         ~~none~~');
+        console.log('        ~~none~~');
 
+        return ;
     }
 }
 

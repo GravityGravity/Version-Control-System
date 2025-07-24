@@ -25,7 +25,7 @@ let shellState = 0;
 
 //Dependecies
 const readlinePromises = require('node:readline');
-const { repoHandle } = require('./repoHandler.js');
+const { repoHandle } = require('./macroRepoHandler.js');
 const { parse } = require('node:path');
 const rl = readlinePromises.createInterface({
 
@@ -70,33 +70,53 @@ function shlLoop () {
             
         //Initial state
             if (shellState === 0) {    
-                if (line[0] === "exit") {
-                    console.log('...Exiting Sapce Version Control Shell... [exit Called]');
-                    rl.close();
-                    return ;
+
+                switch (line[0]) {
+                    case 'exit':
+                        console.log('...Exiting Sapce Version Control Shell... [exit Called]');
+                        rl.close();
+                        return ;
+
+                    case 'access':
+                        if (getRepo(line[1]) !== undefined) {
+
+                            shellState++;
+                            
+
+                        } else {
+
+                            console.log(`   ERROR!! Could not access repository ${line[1]}`);
+
+                        }
+
+                        break;
+                    
+                    case 'back':
+                    
+                        shellState--;
+                        console.log("Back: Shellstate Reduced"); //debug
+                        break;
+
+                    default:
+                        try {
+                            await repoHandle(line[0], line[1]);
+                        } catch (e) {
+                            console.log(e);
+                            break;
+                        }
+                    }
                 }
+
                 
-                if (line[0] === "access") {
-                    
-                    shellState++;  
-                    console.log(shellState); //debug
-                    
-                }
                 
-                if (line[0] === "back") {
+            if (shellState < 0) {
+                console.log('...Exiting Sapce Version Control Shell... [Shell State < 0]');
+                rl.close();
+                return ;
                     
-                    shellState--;
-                    console.log(shellState); //debug
-                    
-                }
-                
-                if (shellState < 0) {
-                    console.log('...Exiting Sapce Version Control Shell... [Shell State < 0]');
-                    rl.close();
-                    return ;
-                    
-                }
             }
+        
+            
         
             
             //shell state prompt print
@@ -135,7 +155,7 @@ function parseLine (shlInput) {
 
     if (parseInput.length > 4) {
 
-        throw new Error(`TOO MANY ARGUMENTS IN COMMAND INPUT: 
+        console.log(`TOO MANY ARGUMENTS IN COMMAND INPUT: 
                 [cmd] [RepositoryName (No Spaces)]`);
     }
     
