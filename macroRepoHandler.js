@@ -11,8 +11,15 @@ const readline = require('node:readline/promises');
 let allRepos = null; //
 let repoData = null;
 
+
+dialog(config).then(dirPath => {
+  console.log('Selected folder:', dirPath);
+}).catch(err => {
+  console.error('User canceled or error:', err);
+});
+
 allRepos = JSON.parse(fs.readFileSync('repos.JSON', 'utf-8'));
-repoHandle('create', 'FirstTrial');
+// repoHandle('create', 'FirstTrial');
 /**
  * DESC: Command selection switch case:
  * 
@@ -64,6 +71,8 @@ async function createRepo (newRepoName) {
 
         let path = await rl.question('  PLEASE INPUT PATH: ');
         rl.close();
+
+
         
         newRepo = {
 
