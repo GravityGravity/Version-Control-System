@@ -5,10 +5,21 @@
 */
 
 const fs = require('node:fs');
+const readline = require('node:readline/promises');
+const { getRepo } = require('./macroRepoHandler.js');
 
+mainRepo = undefined;
 
+function versHandler (cmd, repo) {
 
-versHandler(cmd) {
+    mainRepo = repo;
+
+    if (mainRepo === undefined) {
+
+        console.log(console.log('   \x1b[31mERROR!! microHandler.JS called repository is undefined\u001b[0m');)
+        return undefined;
+
+    }
 
     switch (cmd) {
 
@@ -26,5 +37,25 @@ versHandler(cmd) {
     }
 }
 
+function commit() {
+
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    commitName = await rl.question('What would you like commit version name to be?');
+
+    rl.close();
+
+    try {
+
+        fs.accessSync()
+
+    }
+    
 
 
+
+
+}

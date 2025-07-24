@@ -11,6 +11,7 @@ let allRepos = null; //
 let repoData = null;
 
 allRepos = JSON.parse(fs.readFileSync('repos.JSON', 'utf-8'));
+createRepo('textTest');
 /**
  * DESC: Command selection switch case:
  * 
