@@ -23,10 +23,12 @@ LEVEL2:
 
 let shellState = 0;
 let stringShlState = 'initial>';
+let mainRepo;
 
 //Dependecies
 const readline = require('node:readline/promises');
-const { repoHandle } = require('./macroRepoHandler.js');
+const { repoHandle, getRepo } = require('./macroRepoHandler.js');
+const { versHandler } = require('./microRepoHandler.js');
 const { parse } = require('node:path');
 
 shlLoop();
@@ -59,35 +61,38 @@ async function shlLoop () {
 
             console.log(line);
             
+            if (shellState === 1) {
+
+                await versHandler(line[0], mainRepo);
+
+            }
+
+            if (line[0] === 'back') {
+                    shellState--;
+                    console.log("   ...Back: Shellstate Reduced"); //debug
+            }
+
+
         //Initial state
             if (shellState === 0) {    
 
                 switch (line[0]) {
                     case 'exit':
                         console.log('...Exiting Sapce Version Control Shell... [exit Called]');
-                        rl.close();
                         return ;
 
                     case 'access':
                         if (getRepo(line[1]) !== undefined) {
 
+                            mainRepo = await getRepo(line[1]);
                             shellState++;
-                            
-
+                            console.log('   ...ShellState: ' + shellState)
+                            break;
                         } else {
 
                             console.log(`   ERROR!! Could not access repository ${line[1]}`);
-
+                            break;
                         }
-
-                        break;
-                    
-                    case 'back':
-                    
-                        shellState--;
-                        console.log("Back: Shellstate Reduced"); //debug
-                        break;
-
                     default:
                         try {
                             await repoHandle(line[0], line[1]);
@@ -98,8 +103,7 @@ async function shlLoop () {
                     }
                 }
 
-                
-                
+
             if (shellState < 0) {
                 console.log('...Exiting Sapce Version Control Shell... [Shell State < 0]');
                 rl.close();
@@ -113,6 +117,18 @@ async function shlLoop () {
                 rl.close();
                 return ;
             }     
+
+            if (shellState === 0) {
+
+                stringShlState = 'initial> ';
+
+            }
+
+            if (shellState === 1) {
+
+                stringShlState = mainRepo.name + '> ';
+
+            }
             
         };
 };
@@ -121,7 +137,7 @@ async function shlLoop () {
  * Parse user command input into an array
  * @param {string} shlInput: user command input as string
 */
-function parseLine (shlInput) {
+async function parseLine (shlInput) {
     
     let parseInput = shlInput.toLowerCase();
 

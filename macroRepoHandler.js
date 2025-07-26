@@ -76,9 +76,7 @@ async function createRepo (newRepoName) {
         console.log(newRepo);
 
         allRepos.push(newRepo);
-        let JSONallrepos = JSON.stringify(allRepos, null, "\t");
-        
-        fs.writeFileSync('./repos.JSON', JSONallrepos);
+        saveRepoJson()
 
         console.log(`++Added new Repository: ${newRepoName} to list\n`);
         console.log(allRepos);
@@ -100,13 +98,15 @@ function deleteRepo (repoName) {
 
     if (getRepo(repoName) !== undefined) {
 
-        allRepos.splice(allRepos.findIndex( ({name}) => name === repoName), 2);
+        removeRepo = getRepo(repoName);
 
-        let JSONallrepos = JSON.stringify(allRepos, null, "\t");
-        
-        fs.writeFileSync('./repos.JSON', JSONallrepos);
+        allRepos.splice(allRepos.findIndex( ({name}) => name === repoName), 1);
+        // console.log(removeRepo);
+        // fs.unlinkSync(removeRepo.Path + '\\\.SVCS');
+        saveRepoJson()
 
         console.log(`--Deleted new Repository: ${repoName} to list\n`);
+
 
     } else {
         
@@ -146,17 +146,21 @@ function listRepos () {
  * @returns an object of key-value pairs of repo info
  */
 function getRepo (repoName) {
-    console.log(allRepos); //debug
 
     repo = allRepos.find(({name}) => {
         return name === repoName; });
 
-    console.log('GetRepo() found:')
-    console.log(repo)
+    console.log('   ...GetRepo() found: ' + repoName);
     return repo;
 }
 
+function saveRepoJson() {
+
+    let JSONallrepos = JSON.stringify(allRepos, null, "\t");
+        
+    fs.writeFileSync('./repos.JSON', JSONallrepos);
+
+}
 
 
-
-module.exports = { repoHandle, getRepo };
+module.exports = { repoHandle, getRepo, saveRepoJson, allRepos };
